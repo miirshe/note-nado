@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ThemeToggle } from "./Theme-toggle";
+import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   RegisterLink,
@@ -13,25 +13,27 @@ export default async function Navbar() {
     <nav className="bg-background border-b h-[10vh] flex items-center">
       <div className="container flex items-center justify-between">
         <Link href="">
-          <h1 className="text-3xl tracking-widest font-bold">NoteNado</h1>
+          <h1 className="text-base font-medium tracking-tight md:text-3xl md:tracking-widest md:font-bold">
+            Note<span className="text-primary">Nado</span>
+          </h1>
         </Link>
         <div className="flex items-center gap-x-5">
           <ThemeToggle />
-         {
-            (await isAuthenticated()) ? (
-                <LogoutLink> <Button>Log out</Button></LogoutLink>
-            )
-            : (
-                <div className="flex items-center gap-x-5">
-                <LoginLink>
-                  <Button>Sign In</Button>
-                </LoginLink>
-                <RegisterLink>
-                  <Button variant="secondary">Sign Up</Button>
-                </RegisterLink>
-              </div>
-            )
-         }
+          {(await isAuthenticated()) ? (
+            <LogoutLink>
+              {" "}
+              <Button>Log out</Button>
+            </LogoutLink>
+          ) : (
+            <div className="flex items-center gap-x-5">
+              <LoginLink>
+                <Button>Sign In</Button>
+              </LoginLink>
+              <RegisterLink>
+                <Button variant="secondary">Sign Up</Button>
+              </RegisterLink>
+            </div>
+          )}
         </div>
       </div>
     </nav>
