@@ -18,7 +18,7 @@ model User {
   name             String?
   email            String   @unique
   stripeCustomerId String?  @unique
-  colorScheme      String?  @default("#3B82F6")
+  colorScheme      String?  @default("theme-orange")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
