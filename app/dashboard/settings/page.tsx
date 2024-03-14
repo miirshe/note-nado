@@ -22,6 +22,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import SubmitButton from "@/app/components/submit-buttons";
 import { revalidatePath } from "next/cache";
 async function getData(userId: string) {
+ if(userId){
   const data = await prisma.user.findUnique({
     where: {
       id: userId,
@@ -34,6 +35,7 @@ async function getData(userId: string) {
   });
 
   return data;
+ }
 }
 export default async function Settings() {
   const { getUser } = getKindeServerSession();
