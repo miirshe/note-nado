@@ -1,11 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
 import prisma from "@/lib/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { getStripeSession } from "@/lib/stripe";
+import { getStripeSession, stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
-import { StripeSubscriptionCreationButton } from "@/app/components/submit-buttons";
+import {
+  StripePortal,
+  StripeSubscriptionCreationButton,
+} from "@/app/components/submit-buttons";
+import { unstable_noStore as noStore } from "next/cache";
 const featureItems = [
   { name: "lorem ipsum something." },
   { name: "lorem ipsum something." },
@@ -47,7 +57,7 @@ export default async function BillingPage() {
         stripeCustomerId: true,
       },
     });
-    if (dbUrl?.stripeCustomerId) {
+    if (!dbUrl?.stripeCustomerId) {
       throw new Error("Unable to get customer id ");
     }
 
@@ -58,6 +68,51 @@ export default async function BillingPage() {
     });
     return redirect(subscriptionUrl);
   }
+
+  async function createCustomerPortal() {
+    "use server";
+    const session = await stripe.billingPortal.sessions.create({
+      customer: data?.user.stripeCustomerId as string,
+      return_url:
+        process.env.NODE_ENV === "production"
+          ? (process.env.PRODUCTION_URL as string)
+          : "http://localhost:3000/dashboard",
+    });
+
+    return redirect(session.url);
+  }
+
+  if (data?.status === "active") {
+    return (
+      <div className="grid items-start gap-8">
+        <div className="flex items-center justify-between px-2">
+          <div className="grid gap-1">
+            <h1 className="text-3xl md:text-4xl ">Subscription</h1>
+            <p className="text-lg text-muted-foreground">
+              Settings reagding your subscription
+            </p>
+          </div>
+        </div>
+
+        <Card className="w-full lg:w-2/3">
+          <CardHeader>
+            <CardTitle>Edit Subscription</CardTitle>
+            <CardDescription>
+              Click on the button below, this will give you the opportunity to
+              change your payment details and view your statement at the same
+              time.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form action={createCustomerPortal}>
+              <StripePortal />
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto space-y-4">
       <Card className="flex flex-col">
